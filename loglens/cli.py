@@ -349,6 +349,14 @@ def cmd_classify(args) -> int:
     return 0
 
 
+def cmd_doctor(args) -> int:
+    from loglens.doctor import render_report, run_all
+
+    results = run_all()
+    print(render_report(results))
+    return 0 if all(r.ok for r in results) else 1
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
