@@ -50,9 +50,7 @@ class HasField:
         value = record.get(self.name)
         if value is None:
             return False
-        if isinstance(value, str) and value == "":
-            return False
-        return True
+        return not (isinstance(value, str) and value == "")
 
 
 class HasTimestamp:
@@ -123,18 +121,19 @@ def expand_shorthand(text: str) -> str:
 
     def _level_expand(m: re.Match[str]) -> str:
         name, plus = m.group(1), m.group(2)
-        from loglens.levels import CANONICAL_LEVELS, level_order
+        from loglens.levels import CANONICAL_LEVELS, level_order, normalize_level
 
-        target = name.lower()
-        if target not in CANONICAL_LEVELS:
+        target = normalize_level(name)
+        if target is None or target not in CANONICAL_LEVELS:
             return m.group(0)
         if plus:
-            allowed = [l for l in CANONICAL_LEVELS if level_order(l) >= level_order(target)]
+            allowed = [lvl for lvl in CANONICAL_LEVELS if level_order(lvl) >= level_order(target)]
         else:
             allowed = [target]
-        return " or ".join(f"level = {l}" for l in allowed)
+        return " or ".join(f"level = {lvl}" for lvl in allowed)
 
-    return re.sub(r"\blevel:([a-z]+)(\+?)\b", _level_expand, text)
+    # greedy name, then an optional '+' that must end the token
+    return re.sub(r"\blevel:([a-z]+)(\+)?(?![a-z])", _level_expand, text)
 
 
 def compile_query(text: str) -> Filter:

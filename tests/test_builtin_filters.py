@@ -7,10 +7,10 @@ from datetime import UTC, datetime
 import pytest
 
 from loglens.filters.builtin import (
+    FromSource,
     HasField,
     HasTimestamp,
     LevelAtLeast,
-    FromSource,
     RegexFilter,
     apply_filter,
     expand_shorthand,
