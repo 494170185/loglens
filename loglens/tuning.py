@@ -50,7 +50,9 @@ def suggest_silence_threshold(records: Iterable[Record], factor: float = 10.0) -
     return max(60.0, round(median * factor, 1))
 
 
-def suggest_z_threshold(records: Iterable[Record], field: str, false_positive_rate: float = 0.01) -> float:
+def suggest_z_threshold(
+    records: Iterable[Record], field: str, false_positive_rate: float = 0.01
+) -> float:
     """A z-score cutoff for the anomaly detector given a target FP rate.
 
     Uses the normal approximation: the quantile z such that P(|Z| > z)

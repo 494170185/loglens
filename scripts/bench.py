@@ -16,9 +16,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from loglens.collect import Collector  # noqa: E402
-from loglens.filters.builtin import compile_query, record_context  # noqa: E402
-from loglens.rankings import top_groups  # noqa: E402
+from loglens.collect import Collector
+from loglens.filters.builtin import compile_query, record_context
+from loglens.rankings import top_groups
 
 
 def synthetic_line(i: int) -> str:
@@ -32,7 +32,8 @@ def synthetic_line(i: int) -> str:
             f"2026-09-19 10:{(i // 60) % 60:02d}:{i % 60:02d} "
             f"{'ERROR' if i % 17 == 0 else 'INFO'} worker-{i % 8} handled request in {i % 300}ms"
         )
-    return f'{{"ts": "2026-09-19T10:{(i // 60) % 60:02d}:{i % 60:02d}Z", "level": "info", "msg": "job {i % 200} done"}}'
+    ts = f"2026-09-19T10:{(i // 60) % 60:02d}:{i % 60:02d}Z"
+    return f'{{"ts": "{ts}", "level": "info", "msg": "job {i % 200} done"}}'
 
 
 def generate(path: Path, lines: int) -> None:

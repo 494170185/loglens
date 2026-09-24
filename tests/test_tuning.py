@@ -28,7 +28,9 @@ class TestBurstThreshold:
         assert suggest_burst_threshold(records) >= 10
 
     def test_high_diversity_keeps_minimum(self):
-        records = [rec(f"unique {i}") for i in range(100)]
+        # note: digits normalize away, so use word variety
+        words = [chr(97 + i // 26) + chr(97 + i % 26) for i in range(100)]
+        records = [rec(f"event {w}") for w in words]
         assert suggest_burst_threshold(records) == 3
 
     def test_empty_stream_default(self):
