@@ -6,7 +6,6 @@ from pathlib import Path
 
 from loglens.collect import Collector
 
-
 NGINX = "\n".join(
     [
         '1.2.3.4 - - [19/Sep/2026:10:07:21 +0000] "GET / HTTP/1.1" 200 512',
@@ -57,7 +56,9 @@ class TestCollectFile:
         f = tmp_path / "odd.log"
         f.write_text(NGINX, encoding="utf-8")
         records = Collector().collect_file(f, fmt="raw")
-        assert records[0].fields == {}
+        # raw keeps no parsed status field, but enrichment still finds the ip
+        assert "status" not in records[0].fields
+        assert records[0].message.startswith("1.2.3.4")
 
     def test_source_and_line_numbers(self, tmp_path: Path):
         f = tmp_path / "access.log"
