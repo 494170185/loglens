@@ -12,32 +12,27 @@ class SourceError(Exception):
     """Raised when a source cannot be read at all."""
 
 
-def open_text(path: str | Path):
-    """Open *path* as text, falling back to latin-1 for non-UTF-8 bytes.
+def decode_bytes(data: bytes, path: str | Path = "<bytes>") -> tuple[str, str]:
+    """Decode *data*, trying UTF-8 first and falling back to latin-1.
 
-    latin-1 never fails, so a mojibake line still parses instead of
-    aborting a whole scan; the encoding that worked is exposed on the
-    file object as ``encoding``.
+    Returns ``(text, encoding)``. latin-1 maps every byte, so the fallback
+    always succeeds — a mojibake line still parses instead of aborting the
+    whole scan.
     """
-    last_error: UnicodeDecodeError | None = None
     for encoding in _ENCODINGS:
         try:
-            return open(path, encoding=encoding, errors=None)
-        except UnicodeDecodeError as exc:  # pragma: no cover - exercised via read_lines
-            last_error = exc
-    raise SourceError(f"cannot decode {path}: {last_error}")
+            return data.decode(encoding), encoding
+        except UnicodeDecodeError:
+            continue
+    raise SourceError(f"cannot decode {path}")  # pragma: no cover - latin-1 never fails
 
 
 def read_lines(path: str | Path) -> Iterator[tuple[int, str]]:
     """Yield ``(line_no, line)`` pairs, newline-stripped, 1-based."""
-    handle = open_text(path)
-    with handle:
-        for line_no, line in enumerate(handle, start=1):
-            if line.endswith("\r\n"):
-                line = line[:-2]
-            elif line.endswith(("\n", "\r")):
-                line = line[:-1]
-            yield line_no, line
+    data = Path(path).read_bytes()
+    text, _encoding = decode_bytes(data, path)
+    for line_no, line in enumerate(iter_lines_from(text), start=1):
+        yield line_no, line[1]
 
 
 def iter_lines_from(data: str) -> list[tuple[int, str]]:
