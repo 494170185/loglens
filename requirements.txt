@@ -1,0 +1,2 @@
+# loglens runs on the Python standard library only — no runtime dependencies.
+# This file exists so installers and CI have an explicit, empty contract.
