@@ -122,7 +122,7 @@ def enrich(record: Record, kinds: tuple[str, ...] | None = None) -> Record:
         values = _EXTRACTORS[kind](text)
         if not values:
             continue
-        plural = kind + "s" if not kind.endswith("s") else kind + "es"
+        plural = f"{kind}s"
         extra[plural] = values
         extra[kind] = values[0]
     extra.update(extract_kvs(text))

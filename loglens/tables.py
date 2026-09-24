@@ -12,6 +12,19 @@ _WIDE_RANGES = re.compile(
 )
 
 
+def _as_text(value: object) -> str:
+    """Render any scalar cell as text (None -> '', bool -> yes/no)."""
+    if value is None:
+        return ""
+    if isinstance(value, bool):
+        return "yes" if value else "no"
+    if not isinstance(value, str):
+        from loglens.parsers.jsonl import render_value
+
+        return render_value(value)
+    return value
+
+
 def display_width(text: str) -> int:
     """Column cells needed to show *text*: wide chars count as 2."""
     width = 0
@@ -65,8 +78,8 @@ def render_table(
     Alignment is per column: 'left' (default), 'right' or 'center'.
     Cell widths use display width so CJK text still lines up.
     """
-    body = [list(row) for row in rows]
-    table = [list(headers), *body] if headers else body
+    body = [[_as_text(v) for v in row] for row in rows]
+    table = [[_as_text(h) for h in headers], *body] if headers else body
     if not table:
         return ""
     columns = max(len(row) for row in table)

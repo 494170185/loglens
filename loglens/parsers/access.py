@@ -34,6 +34,9 @@ def parse_access_line(line: str, source: str | None = None, line_no: int | None 
     if not m:
         return Record(raw=line, message=line, source=source, line_no=line_no)
     parts = m.groupdict()
+    from loglens.timestamps import TimestampParser
+
+    timestamp = TimestampParser().parse(parts["time"])
     fields: dict[str, object] = {
         "client": parts["client"],
         "ident": parts["ident"],
@@ -54,6 +57,7 @@ def parse_access_line(line: str, source: str | None = None, line_no: int | None 
     return Record(
         raw=line,
         message=message,
+        timestamp=timestamp,
         fields=fields,
         source=source,
         line_no=line_no,
