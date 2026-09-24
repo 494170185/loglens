@@ -100,8 +100,7 @@ def _timestamp_from(fields: dict[str, Any]):
 def _level_from(fields: dict[str, Any]) -> str | None:
     from loglens.levels import normalize_level
 
-    raw = _pick(fields, _LEVEL_KEYS)
-    return normalize_level(raw) if isinstance(raw, str) else normalize_level(raw)
+    return normalize_level(_pick(fields, _LEVEL_KEYS))
 
 
 def looks_like_json(line: str) -> bool:
