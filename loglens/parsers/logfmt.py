@@ -8,7 +8,7 @@ from loglens.model import Record
 
 _PAIR_RE = re.compile(
     r'(?P<key>[A-Za-z_][A-Za-z0-9_.\-]*)='
-    r'(?P<value>"(?:[^"\\]|\\.)*"|\'[^\']*\'|\S+)'
+    r'(?P<value>"(?:[^"\\]|\\.)*"|\'[^\']*\'|\S*)'
 )
 
 _LEVEL_KEYS = ("level", "lvl", "severity")
@@ -69,6 +69,8 @@ def _unquote(raw: str) -> str:
 
 
 def _coerce(text: str) -> object:
+    if text == "":
+        return ""
     if text == "-":
         return ""
     lowered = text.lower()
@@ -76,7 +78,7 @@ def _coerce(text: str) -> object:
         return True
     if lowered == "false":
         return False
-    if lowered == "null" or text == "":
+    if lowered == "null":
         return None
     try:
         return int(text)
